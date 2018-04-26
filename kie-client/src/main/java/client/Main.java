@@ -1,28 +1,38 @@
 package client;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.kie.api.KieServices;
+import org.kie.api.command.BatchExecutionCommand;
+import org.kie.api.command.Command;
+import org.kie.api.command.KieCommands;
+import org.kie.api.runtime.ExecutionResults;
 import org.kie.server.api.marshalling.MarshallingFormat;
+import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.api.model.admin.OrgEntities;
 import org.kie.server.api.model.definition.QueryDefinition;
 import org.kie.server.api.model.definition.QueryFilterSpec;
 import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.util.QueryFilterSpecBuilder;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesFactory;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.QueryServicesClient;
+import org.kie.server.client.RuleServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
+import org.kie.server.client.admin.UserTaskAdminServicesClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.example.OrderInfo;
 import com.example.SupplierInfo;
-
 
 public class Main {
 
@@ -33,24 +43,64 @@ public class Main {
 	private static final String password = System.getProperty("password", "donato");
 	private static final String CONTAINER = "order-management_1.0-SNAPSHOT";
 	private static String PROCESS_ID = "OrderManagement.OrderManagement";
-	
 
 	private static final String QUERY_NAME_ALL_PROCESS_INSTANCES_WITH_VARIABLES = "getAllProcessInstancesWithVariables";
 
 	public static void main(String[] args) {
 		Main clientApp = new Main();
 		long start = System.currentTimeMillis();
-		
-//		clientApp.registerQuery();
-//		clientApp.advancedQuery();
-//		clientApp.launchProcess();
-//		clientApp.findTasksAssignedAsPotentialOwner();
-//		clientApp.startTask(12L);
-//		clientApp.getTaskInputContentByTaskId(3L);
-		clientApp.completeTask(12L);
+
+		// clientApp.registerQuery();
+		// clientApp.advancedQuery();
+		// clientApp.launchProcess();
+		// clientApp.findTasksAssignedAsPotentialOwner();
+		// clientApp.startTask(12L);
+		// clientApp.getTaskInputContentByTaskId(3L);
+		// clientApp.completeTask(12L);
+		//clientApp.evaluateDecision();
+		clientApp.updateTask();
 
 		long end = System.currentTimeMillis();
 		System.out.println("elapsed time: " + (end - start));
+	}
+
+	private void evaluateDecision() {
+		KieServicesClient client = getClient();
+		RuleServicesClient ruleServicesClient = client.getServicesClient(RuleServicesClient.class);
+
+		KieCommands cmdFactory = KieServices.Factory.get().getCommands();
+
+		List<Command<?>> commands = new ArrayList<>();
+
+		OrderInfo orderInfo = new OrderInfo(0, "Item1", "basic", "low", 500, null, null);
+
+		commands.add(cmdFactory.newInsert(orderInfo));
+		commands.add(cmdFactory.newAgendaGroupSetFocus("approval"));
+		commands.add(cmdFactory.newFireAllRules());
+
+		// The following command retrieves all objects from Working Memory
+		commands.add(cmdFactory.newGetObjects("objects"));
+
+		commands.add(cmdFactory.newDispose());
+
+		BatchExecutionCommand batchExecution = cmdFactory.newBatchExecution(commands);
+		ServiceResponse<ExecutionResults> serviceResponse = ruleServicesClient.executeCommandsWithResults(CONTAINER,
+				batchExecution);
+
+		serviceResponse.getResult().getIdentifiers().forEach(i -> {
+			System.out.println(serviceResponse.getResult().getValue(i));
+		});
+
+	}
+
+	private void updateTask() {
+		KieServicesClient client = getClient();
+		UserTaskAdminServicesClient adminServicesClient = client.getServicesClient(UserTaskAdminServicesClient.class);
+		OrgEntities orgEntities = new OrgEntities();
+		List<String> groups = new ArrayList<>();
+		groups.add("user");
+		orgEntities.setGroups(groups);
+		adminServicesClient.addPotentialOwners("SimpleCase_1.0", 2L, false, orgEntities);
 	}
 
 	private void completeTask(Long taskId) {
@@ -66,9 +116,9 @@ public class Main {
 			orderInfo.setItem("Monitor Dell U2412M");
 			orderInfo.setUrgency("low");
 			orderInfo.setCategory("basic");
-			
+
 			params.put("orderInfo", orderInfo);
-			
+
 			SupplierInfo supplierInfo = new SupplierInfo();
 			supplierInfo.setUser("donato");
 
@@ -80,7 +130,7 @@ public class Main {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void getTaskInputContentByTaskId(Long taskId) {
 		try {
 
@@ -112,7 +162,7 @@ public class Main {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	private void startTask(Long taskId) {
@@ -124,7 +174,7 @@ public class Main {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	public void launchProcess() {
@@ -139,7 +189,7 @@ public class Main {
 			OrderInfo orderInfo = new OrderInfo();
 			orderInfo.setItem("Monitor Dell U2412M");
 			orderInfo.setUrgency("Low");
-			
+
 			variables.put("orderInfo", orderInfo);
 
 			// ---------------------------
@@ -156,14 +206,12 @@ public class Main {
 
 			QueryServicesClient queryClient = client.getServicesClient(QueryServicesClient.class);
 
-			QueryFilterSpec spec = new QueryFilterSpecBuilder()
-					.equalsTo("variableId", "istruttore")
-					.equalsTo("value", "istruttore7")
-					.equalsTo("status", 1)
-					.get();
+			QueryFilterSpec spec = new QueryFilterSpecBuilder().equalsTo("variableId", "istruttore")
+					.equalsTo("value", "istruttore7").equalsTo("status", 1).get();
 
-			List<ProcessInstance> listProcessInstance = queryClient.query(QUERY_NAME_ALL_PROCESS_INSTANCES_WITH_VARIABLES,
-					"ProcessInstances",spec, 0, 30, ProcessInstance.class);
+			List<ProcessInstance> listProcessInstance = queryClient.query(
+					QUERY_NAME_ALL_PROCESS_INSTANCES_WITH_VARIABLES, "ProcessInstances", spec, 0, 30,
+					ProcessInstance.class);
 
 			for (ProcessInstance processInstance : listProcessInstance) {
 				System.out.println(">>>" + processInstance.getId());
@@ -185,8 +233,7 @@ public class Main {
 			queryDefinition.setExpression("select pil.*, v.variableId, v.value " + "from ProcessInstanceLog pil "
 					+ "INNER JOIN (select vil.processInstanceId ,vil.variableId, MAX(vil.ID) maxvilid  FROM VariableInstanceLog vil "
 					+ "GROUP BY vil.processInstanceId, vil.variableId ORDER BY vil.processInstanceId)  x "
-					+ "ON (v.variableId = x.variableId  AND v.id = x.maxvilid ) " 
-					+ "INNER JOIN VariableInstanceLog v "
+					+ "ON (v.variableId = x.variableId  AND v.id = x.maxvilid ) " + "INNER JOIN VariableInstanceLog v "
 					+ "ON (v.processInstanceId = pil.processInstanceId)");
 			queryDefinition.setSource("java:jboss/datasources/ExampleDS");
 			queryDefinition.setTarget("CUSTOM");
