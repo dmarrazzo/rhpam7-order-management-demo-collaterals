@@ -57,8 +57,8 @@ public class Main {
 		// clientApp.startTask(12L);
 		// clientApp.getTaskInputContentByTaskId(3L);
 		// clientApp.completeTask(12L);
-		//clientApp.evaluateDecision();
-		clientApp.updateTask();
+		clientApp.evaluateDecision();
+		//clientApp.updateTask();
 
 		long end = System.currentTimeMillis();
 		System.out.println("elapsed time: " + (end - start));
@@ -245,6 +245,10 @@ public class Main {
 
 	private KieServicesClient getClient() {
 		KieServicesConfiguration config = KieServicesFactory.newRestConfiguration(URL, user, password);
+
+		// Configuration for JMS
+		//		KieServicesConfiguration config = KieServicesFactory.newJMSConfiguration(connectionFactory, requestQueue, responseQueue, username, password)
+		
 		// Marshalling
 		config.setMarshallingFormat(MarshallingFormat.JSON);
 		Set<Class<?>> extraClasses = new HashSet<Class<?>>();
