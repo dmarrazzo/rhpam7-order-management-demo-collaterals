@@ -1,6 +1,7 @@
 package client;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -13,12 +14,13 @@ import org.kie.api.command.Command;
 import org.kie.api.command.KieCommands;
 import org.kie.api.runtime.ExecutionResults;
 import org.kie.server.api.marshalling.MarshallingFormat;
+import org.kie.server.api.model.KieContainerResource;
+import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.admin.OrgEntities;
 import org.kie.server.api.model.definition.QueryDefinition;
 import org.kie.server.api.model.definition.QueryFilterSpec;
 import org.kie.server.api.model.instance.ProcessInstance;
-import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.util.QueryFilterSpecBuilder;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
@@ -38,7 +40,7 @@ public class Main {
 
 	final static Logger log = LoggerFactory.getLogger(Main.class);
 
-	private static final String URL = "http://localhost:8081/kie-server/services/rest/server";
+	private static final String URL = "http://localhost:8080/kie-server/services/rest/server";
 	private static final String user = System.getProperty("username", "donato");
 	private static final String password = System.getProperty("password", "donato");
 	private static final String CONTAINER = "order-management_1.0-SNAPSHOT";
@@ -48,6 +50,8 @@ public class Main {
 
 	public static void main(String[] args) {
 		Main clientApp = new Main();
+		
+	
 		long start = System.currentTimeMillis();
 
 		// clientApp.registerQuery();
@@ -57,8 +61,10 @@ public class Main {
 		// clientApp.startTask(12L);
 		// clientApp.getTaskInputContentByTaskId(3L);
 		// clientApp.completeTask(12L);
-		clientApp.evaluateDecision();
+		// clientApp.evaluateDecision();
 		//clientApp.updateTask();
+		clientApp.getContainers();
+		
 
 		long end = System.currentTimeMillis();
 		System.out.println("elapsed time: " + (end - start));
@@ -91,6 +97,17 @@ public class Main {
 			System.out.println(serviceResponse.getResult().getValue(i));
 		});
 
+	}
+	
+	private void getContainers() {
+
+		KieServicesClient client = getClient();
+		
+		ServiceResponse<KieContainerResourceList> listContainers = client.listContainers();
+		List<KieContainerResource> containers = listContainers.getResult().getContainers();
+		containers.forEach(c -> {
+			System.out.format("id: %s\n", c.getContainerId());
+		});
 	}
 
 	private void updateTask() {

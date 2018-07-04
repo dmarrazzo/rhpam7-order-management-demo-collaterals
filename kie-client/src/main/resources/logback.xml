@@ -8,7 +8,7 @@
   </appender>
 
   <!-- To override the debug log level from the command line, use the VM option "-Dlogback.level.org.optaplanner=trace" -->
-  <logger name="org.drools" level="trace"/>
+  <logger name="org.kie" level="debug"/>
 
   <root level="info">
     <appender-ref ref="consoleAppender" />
