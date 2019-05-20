@@ -1,6 +1,8 @@
 package client;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import com.example.OrderInfo;
 
@@ -22,11 +24,11 @@ public class DMNTest {
 	private static final String CONTAINER = "order-management-dmn";
 
 	public static void main(String[] args) {
-		DMNTest clientApp = new DMNTest();
+		DMNTest dmnTest = new DMNTest();
 
 		long start = System.currentTimeMillis();
-		
-		clientApp.evaluateDMN();
+
+		dmnTest.evaluateDMN();
 
 		long end = System.currentTimeMillis();
 		System.out.println("elapsed time: " + (end - start));
@@ -41,23 +43,28 @@ public class DMNTest {
 
 		DMNContext dmnContext = dmnClient.newContext();
 
-        OrderInfo orderInfo = new OrderInfo(0, "item", "basic", "low", 1000, false, null, null, 1000, null);
+		OrderInfo orderInfo = new OrderInfo(0, "item", "basic", "low", 1000, false, null, null, 1000, null);
 
 		dmnContext.set("Order Information", orderInfo);
 
 		ServiceResponse<DMNResult> result = dmnClient.evaluateAll(CONTAINER, namespace, modelName, dmnContext);
 		System.out.println(result);
-		
+
 	}
 
 	private KieServicesClient getClient() {
 		KieServicesConfiguration config = KieServicesFactory.newRestConfiguration(URL, user, password);
 
 		// Configuration for JMS
-		//		KieServicesConfiguration config = KieServicesFactory.newJMSConfiguration(connectionFactory, requestQueue, responseQueue, username, password)
-		
+		// KieServicesConfiguration config =
+		// KieServicesFactory.newJMSConfiguration(connectionFactory, requestQueue,
+		// responseQueue, username, password)
+
 		Map<String, String> headers = null;
 		config.setHeaders(headers);
+		Set<Class<?>> classes = new HashSet<>();
+		classes.add(OrderInfo.class);
+		config.addExtraClasses(classes);
 		KieServicesClient client = KieServicesFactory.newKieServicesClient(config);
 
 		return client;
