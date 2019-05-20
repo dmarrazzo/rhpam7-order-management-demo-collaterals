@@ -1,3 +1,6 @@
 [submodule "order-management-demo-repo"]
 	path = order-management-demo-repo
 	url = git@github.com:jbossdemocentral/rhpam7-order-management-demo-repo.git
+[submodule "order-management-dmn"]
+	path = order-management-dmn
+	url = ./order-management-dmn

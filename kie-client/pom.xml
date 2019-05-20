@@ -31,6 +31,13 @@
 			<groupId>org.kie.server</groupId>
 			<artifactId>kie-server-client</artifactId>
 		</dependency>
+		<!--order management process repo for data types-->
+		<dependency>
+			<groupId>com.example</groupId>
+			<artifactId>order-management</artifactId>
+			<version>1.1-SNAPSHOT</version>
+		</dependency>
+		<!--dmn lib-->
 		<!-- Logging -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -41,17 +48,11 @@
 			<artifactId>logback-classic</artifactId>
 			<scope>runtime</scope>
 		</dependency>
-
+		<!--test-->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>com.example</groupId>
-			<artifactId>order-management</artifactId>
-			<version>1.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 

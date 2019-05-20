@@ -1,18 +1,21 @@
 package client;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.example.OrderInfo;
+import com.example.SupplierInfo;
+
 import org.kie.api.KieServices;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
 import org.kie.api.command.KieCommands;
 import org.kie.api.runtime.ExecutionResults;
+import org.kie.api.runtime.process.ProcessContext;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
@@ -33,9 +36,7 @@ import org.kie.server.client.admin.UserTaskAdminServicesClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.example.OrderInfo;
-import com.example.SupplierInfo;
-
+@SuppressWarnings("unused")
 public class Main {
 
 	final static Logger log = LoggerFactory.getLogger(Main.class);
@@ -78,7 +79,7 @@ public class Main {
 
 		List<Command<?>> commands = new ArrayList<>();
 
-		OrderInfo orderInfo = new OrderInfo(0, "Item1", "basic", "low", 500, null, null);
+		OrderInfo orderInfo = new OrderInfo(0,"Item1", "basic", "low", 500, null,"",null,500,null);
 
 		commands.add(cmdFactory.newInsert(orderInfo));
 		commands.add(cmdFactory.newAgendaGroupSetFocus("approval"));

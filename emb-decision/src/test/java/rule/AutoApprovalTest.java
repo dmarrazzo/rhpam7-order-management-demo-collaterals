@@ -23,9 +23,10 @@ public class AutoApprovalTest {
 		kieSession = kieContainer.newKieSession();
 	}
 
+	@SuppressWarnings("unused")
 	private void initFromMaven() {
 		KieServices kieServices = KieServices.Factory.get();
-		ReleaseId releaseId = kieServices.newReleaseId("com.example", "order-management", "1.0-SNAPSHOT");
+		ReleaseId releaseId = kieServices.newReleaseId("com.example", "order-management", "1.1-SNAPSHOT");
 		KieContainer kieContainer = kieServices.newKieContainer(releaseId);
 		
 		kieSession = kieContainer.newKieSession();
@@ -44,7 +45,7 @@ public class AutoApprovalTest {
 
 	@Test
 	public void test() {
-		OrderInfo orderInfo = new OrderInfo(0, "Item1", "basic", "low", 500, null, null);
+		OrderInfo orderInfo = new OrderInfo(0,"Item1", "basic", "low", 500, null,"",null,500,null);
 		FactHandle fact = kieSession.insert(orderInfo);
 		kieSession.getAgenda().getAgendaGroup("approval").setFocus();
 		int firedRules = kieSession.fireAllRules();
