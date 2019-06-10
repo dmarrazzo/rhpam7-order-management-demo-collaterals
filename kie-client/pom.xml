@@ -7,7 +7,7 @@
 	<groupId>com.example</groupId>
 	<version>1.0-SNAPSHOT</version>
 	<properties>
-		<version>7.0.1.GA-redhat-1</version>
+		<ba.version>7.3.1.GA-redhat-00002</ba.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
@@ -16,9 +16,9 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>org.jboss.bom</groupId>
-				<artifactId>rhpam-platform-bom</artifactId>
-				<version>${version}</version>
+				<groupId>com.redhat.ba</groupId>
+				<artifactId>ba-platform-bom</artifactId>
+				<version>${ba.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>

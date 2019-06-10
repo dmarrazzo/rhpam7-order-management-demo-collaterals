@@ -23,8 +23,14 @@ import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.admin.OrgEntities;
 import org.kie.server.api.model.definition.QueryDefinition;
 import org.kie.server.api.model.definition.QueryFilterSpec;
+import org.kie.server.api.model.definition.TaskField;
+import org.kie.server.api.model.definition.TaskQueryFilterSpec;
 import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.TaskInstance;
+import org.kie.server.api.model.instance.TaskInstanceList;
+import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.api.util.QueryFilterSpecBuilder;
+import org.kie.server.api.util.TaskQueryFilterSpecBuilder;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesFactory;
@@ -51,8 +57,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		Main clientApp = new Main();
-		
-	
+
 		long start = System.currentTimeMillis();
 
 		// clientApp.registerQuery();
@@ -63,12 +68,42 @@ public class Main {
 		// clientApp.getTaskInputContentByTaskId(3L);
 		// clientApp.completeTask(12L);
 		// clientApp.evaluateDecision();
-		//clientApp.updateTask();
-		clientApp.getContainers();
-		
+		// clientApp.updateTask();
+		// clientApp.getContainers();
+		clientApp.taskListQuery();
 
 		long end = System.currentTimeMillis();
 		System.out.println("elapsed time: " + (end - start));
+	}
+
+	private void taskList() {
+		try {
+			KieServicesClient client = getClient();
+			UserTaskServicesClient userTaskServicesClient = client.getServicesClient(UserTaskServicesClient.class);
+			List<TaskSummary> list = userTaskServicesClient.findTasksByStatusByProcessInstanceId(1L, null, 0, 10);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void taskListQuery() {
+		try {
+			KieServicesClient client = getClient();
+
+
+			String queryName = "jbpmHumanTasks";
+			String mapper = "UserTasks";
+			long processInstanceId = 1L;
+			
+			QueryServicesClient queryClient = client.getServicesClient(QueryServicesClient.class);
+			TaskQueryFilterSpec filterSpec = new TaskQueryFilterSpecBuilder()
+					.equalsTo(TaskField.PROCESSINSTANCEID, processInstanceId).get();
+			List<TaskInstance> result = queryClient.query(queryName, mapper, filterSpec, 0, 10, TaskInstance.class);
+
+			System.out.println(result);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void evaluateDecision() {
