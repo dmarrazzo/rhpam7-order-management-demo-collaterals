@@ -6,7 +6,8 @@
 	<artifactId>emb-decision</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<properties>
-		<version>7.1.1.GA-redhat-00001</version>
+		<version>7.5.0.redhat-00004</version>
+		<version.org.kie>7.26.0.Final-redhat-00005</version.org.kie>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 	</properties>
@@ -74,11 +75,13 @@
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
+			<version>1.2.3</version>
 		</dependency>
 		<!-- TEST -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
+			<version>4.12.0.redhat-003</version>
 		</dependency>
 	</dependencies>
 	<build>
@@ -94,6 +97,12 @@
 						<exclude>**/.*.java</exclude>
 					</excludes>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.kie</groupId>
+				<artifactId>kie-maven-plugin</artifactId>
+				<version>${version.org.kie}</version>
+				<extensions>true</extensions>
 			</plugin>
 		</plugins>
 	</build>
