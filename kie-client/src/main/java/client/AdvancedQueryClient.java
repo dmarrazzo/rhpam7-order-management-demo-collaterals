@@ -1,17 +1,18 @@
 package client;
 
+import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.example.OrderInfo;
-import com.example.SupplierInfo;
 
-import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.definition.QueryDefinition;
 import org.kie.server.api.model.definition.QueryFilterSpec;
+import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.util.QueryFilterSpecBuilder;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
@@ -34,17 +35,35 @@ public class AdvancedQueryClient {
 
 	private static final String QUERY_NAME_ALL_PROCESS_INSTANCES_WITH_VARIABLES = "getAllProcessInstancesWithVariables";
 
-    public static void main(String[] args) {
-        AdvancedQueryClient queryClient = new AdvancedQueryClient();
+	public static void main(String[] args) {
+		AdvancedQueryClient queryClient = new AdvancedQueryClient();
 
 		long start = System.currentTimeMillis();
 
-		queryClient.registerQuery();
-		// queryClient.advancedQuery();
-
+		//queryClient.getAllProcesses();
+		queryClient.rawAdvancedQuery();
+		// queryClient.registerQuery();
+		
 		long end = System.currentTimeMillis();
 		System.out.println("elapsed time: " + (end - start));
-    }
+	}
+
+	private void getAllProcesses() {
+		try {
+			KieServicesClient client = getClient();
+
+			QueryServicesClient queryClient = client.getServicesClient(QueryServicesClient.class);
+
+			List<List> rawList = queryClient.query("f49bc778-4883-4295-b391-6454fe64e42b",
+					QueryServicesClient.QUERY_MAP_RAW, 0, 10, List.class);
+
+			System.out.println(rawList);
+			System.out.println("List len: "+rawList.size());
+			client.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 	public void registerQuery() {
 		try {
@@ -62,44 +81,37 @@ public class AdvancedQueryClient {
 			queryDefinition.setSource("java:jboss/datasources/ExampleDS");
 			queryDefinition.setTarget("CUSTOM");
 			queryClient.replaceQuery(queryDefinition);
+			client.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-    }
-    
-    public void advancedQuery() {
+	}
+
+	public void rawAdvancedQuery() {
 		try {
 			KieServicesClient client = getClient();
 
 			QueryServicesClient queryClient = client.getServicesClient(QueryServicesClient.class);
 
-			QueryFilterSpec spec = new QueryFilterSpecBuilder().equalsTo("variableId", "istruttore")
-					.equalsTo("value", "istruttore7").equalsTo("status", 1).get();
+			List<List> rawList = queryClient.query("fe375037-8da7-43c3-a0d9-28051c39fb9c",
+					QueryServicesClient.QUERY_MAP_RAW, 0, 10, List.class);
 
-			List<ProcessInstance> listProcessInstance = queryClient.query(
-					QUERY_NAME_ALL_PROCESS_INSTANCES_WITH_VARIABLES, "ProcessInstances", spec, 0, 30,
-					ProcessInstance.class);
-
-			for (ProcessInstance processInstance : listProcessInstance) {
-				System.out.println(">>>" + processInstance.getId());
-			}
-
+			System.out.println(rawList);
+			System.out.println("List len: "+rawList.size());
+			client.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-    }
-    
-    private KieServicesClient getClient() {
+	}
+
+	private KieServicesClient getClient() {
 		KieServicesConfiguration config = KieServicesFactory.newRestConfiguration(URL, user, password);
 
-		// Configuration for JMS
-		//		KieServicesConfiguration config = KieServicesFactory.newJMSConfiguration(connectionFactory, requestQueue, responseQueue, username, password)
-		
 		// Marshalling
 		config.setMarshallingFormat(MarshallingFormat.JSON);
 		Set<Class<?>> extraClasses = new HashSet<Class<?>>();
+		extraClasses.add(Date.class);
 		extraClasses.add(OrderInfo.class);
-		extraClasses.add(SupplierInfo.class);
 		config.addExtraClasses(extraClasses);
 		Map<String, String> headers = null;
 		config.setHeaders(headers);
