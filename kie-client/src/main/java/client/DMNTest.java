@@ -22,7 +22,7 @@ public class DMNTest {
 	private static final String URL = "http://localhost:8080/kie-server/services/rest/server";
 	private static final String user = System.getProperty("username", "donato");
 	private static final String password = System.getProperty("password", "donato");
-	private static final String CONTAINER = "order-management-dmn";
+	private static final String CONTAINER = "order-management";
 
 	public static void main(String[] args) {
 		DMNTest dmnTest = new DMNTest();
@@ -39,7 +39,7 @@ public class DMNTest {
 		KieServicesClient client = getClient();
 		DMNServicesClient dmnClient = client.getServicesClient(DMNServicesClient.class);
 
-		String namespace = "https://github.com/kiegroup/drools/kie-dmn/_669C7599-69B9-491F-8D2F-47AD5B813116";
+		String namespace = "http://www.redhat.com/dmn/demo/order-management-dmn";
 		String modelName = "order-approval";
 
 		DMNContext dmnContext = dmnClient.newContext();

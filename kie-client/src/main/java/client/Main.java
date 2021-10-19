@@ -45,7 +45,7 @@ public class Main {
 	private static final String user = System.getProperty("username", "donato");
 	private static final String password = System.getProperty("password", "donato");
 	private static final String CONTAINER = "order-management_1.1-SNAPSHOT";
-	private static String PROCESS_ID = "OrderManagement";
+	private static String PROCESS_ID = "Order-Management.order-management";
 
 	private static final String QUERY_NAME_ALL_PROCESS_INSTANCES_WITH_VARIABLES = "getAllProcessInstancesWithVariables";
 
@@ -56,7 +56,7 @@ public class Main {
 
 		// clientApp.registerQuery();
 		// clientApp.advancedQuery();
-		// clientApp.launchProcess();
+		clientApp.launchProcess();
 		// clientApp.findTasksAssignedAsPotentialOwner();
 		// clientApp.startTask(12L);
 		// clientApp.getTaskInputContentByTaskId(3L);
@@ -64,7 +64,7 @@ public class Main {
 		// clientApp.evaluateDecision();
 		// clientApp.updateTask();
 		// clientApp.getContainers();
-		clientApp.taskListQuery();
+		//clientApp.taskListQuery();
 
 		long end = System.currentTimeMillis();
 		System.out.println("elapsed time: " + (end - start));
